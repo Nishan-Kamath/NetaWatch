@@ -93,7 +93,7 @@ def signup():
 
         flash("Account created successfully!", "success")
         session['user'] = email_or_phone
-        return redirect(url_for('dashboard'))
+        return redirect(url_for('login'))
 
     return render_template("signup.html")
 
