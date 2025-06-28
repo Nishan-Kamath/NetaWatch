@@ -1,92 +1,105 @@
-<!-- polls.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Polls & Public Opinion</title>
-  <link rel="stylesheet" href="/static/css/theme.css" /> <!-- Use your old NetaWatch theme -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/chart.js/dist/Chart.min.css">
+  <title>NetaWatch – Public Opinion Polls</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;600&display=swap"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
-    .polls-container {
-      max-width: 900px;
-      margin: auto;
-      padding: 2rem;
-    }
-    .poll-card {
-      background: #fff;
-      border-radius: 1rem;
-      padding: 1.5rem;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-      margin-bottom: 2rem;
-    }
-    .chart-container {
-      margin-top: 1rem;
-    }
+    body { font-family: 'Poppins', sans-serif; margin: 0; background: #f5f5f5; color: #333; }
+    .navbar { position: sticky; top: 0; background: #e50909; color: white; padding: 12px 24px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+    .navbar .logo { font-size: 1.3rem; font-weight: 600; }
+    .navbar .links a { color: white; text-decoration: none; margin-left: 20px; font-weight: 500; }
+    .container { max-width: 900px; margin: 30px auto; padding: 0 20px; }
+    .poll-card { background: white; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); padding: 20px; margin-bottom: 30px; }
+    h2 { text-align: center; color: #e50909; }
+    input, button { font-family: inherit; }
+    .input { width: 100%; padding: 10px; margin-top: 10px; border: 1px solid #ccc; border-radius: 6px; }
+    .btn { padding: 10px 15px; border: none; border-radius: 6px; cursor: pointer; }
+    .btn-primary { background: #e50909; color: white; }
+    .btn-secondary { background: #ccc; }
+    .chart-container { margin-top: 20px; height: 300px; }
     @media (max-width: 600px) {
-      .poll-card { padding: 1rem; }
+      .navbar { flex-direction: column; align-items: flex-start; }
+      .navbar .links { margin-top: 10px; }
     }
   </style>
 </head>
 <body>
-  {% include 'navbar.html' %}
-  <div class="polls-container">
-    <h2 class="text-center text-2xl font-bold mb-6">📊 Public Opinion Polls</h2>
+  <div class="navbar">
+    <div class="logo">NetaWatch</div>
+    <div class="links">
+      <a href="/public_feed">Home</a>
+      <a href="/report">Report</a>
+      <a href="/dashboard">Dashboard</a>
+      <a href="/logout">Logout</a>
+    </div>
+  </div>
+
+  <div class="container">
+    <h2>🗳️ Public Opinion Polls</h2>
 
     {% if user_verified %}
     <form method="POST" action="/create_poll" class="poll-card">
-      <h3>Create a New Poll</h3>
-      <input type="text" name="question" placeholder="Enter your poll question..." required class="input"/><br><br>
-      <input type="text" name="option1" placeholder="Option 1" required class="input"/>
-      <input type="text" name="option2" placeholder="Option 2" required class="input"/>
-      <button type="submit" class="btn btn-primary mt-2">Create Poll</button>
+      <h3>Create New Poll</h3>
+      <input class="input" type="text" name="question" placeholder="Your question..." required />
+      <input class="input" type="text" name="option1" placeholder="Option 1" required />
+      <input class="input" type="text" name="option2" placeholder="Option 2" required />
+      <button type="submit" class="btn btn-primary">Create</button>
     </form>
     {% endif %}
 
     {% for poll in polls %}
     <div class="poll-card">
       <h4>{{ poll.question }}</h4>
-      <form method="POST" action="/vote/{{ poll.id }}">
+      <form method="POST" action="/vote/{{ poll._id }}">
         {% for option in poll.options %}
           <label><input type="radio" name="option" value="{{ option }}" required> {{ option }}</label><br>
         {% endfor %}
-        <button type="submit" class="btn btn-success mt-2">Vote</button>
+        <button type="submit" class="btn btn-primary">Vote</button>
       </form>
+
       <div class="chart-container">
-        <canvas id="chart-{{ poll.id }}"></canvas>
+        <canvas id="chart-{{ loop.index }}" class="poll-chart" data-labels='{{ poll.options|tojson }}' data-votes='{{ poll.votes|tojson }}'></canvas>
       </div>
-      <script>
-        const ctx{{ poll.id }} = document.getElementById('chart-{{ poll.id }}').getContext('2d');
-        new Chart(ctx{{ poll.id }}, {
-          type: 'bar',
-          data: {
-            labels: {{ poll.options|tojson }},
-            datasets: [{
-              label: 'Votes',
-              data: {{ poll.votes|tojson }},
-              backgroundColor: '#ff4d4d'
-            }]
-          },
-          options: {
-            responsive: true,
-            maintainAspectRatio: false,
-          }
-        });
-      </script>
-      <div class="mt-2">
-        <strong>Discussion:</strong>
-        <form method="POST" action="/comment/{{ poll.id }}">
-          <input type="text" name="comment" placeholder="Add your thoughts..." class="input" required>
+
+      <div>
+        <form method="POST" action="/poll_comment/{{ poll._id }}">
+          <input type="text" name="comment" class="input" placeholder="Add a comment..." required />
           <button type="submit" class="btn btn-secondary">Comment</button>
         </form>
         <ul>
           {% for comment in poll.comments %}
-          <li>{{ comment }}</li>
+            <li>{{ comment }}</li>
           {% endfor %}
         </ul>
       </div>
     </div>
     {% endfor %}
   </div>
+
+  <script>
+    document.querySelectorAll('.poll-chart').forEach((canvas) => {
+      const labels = JSON.parse(canvas.dataset.labels);
+      const votes = JSON.parse(canvas.dataset.votes);
+      new Chart(canvas.getContext('2d'), {
+        type: 'bar',
+        data: {
+          labels: labels,
+          datasets: [{
+            label: 'Votes',
+            data: votes,
+            backgroundColor: '#e50909'
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false
+        }
+      });
+    });
+  </script>
 </body>
 </html>

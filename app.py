@@ -235,5 +235,50 @@ def comment_issue(issue_id):
     issues.update_one({"_id": ObjectId(issue_id)}, {"$push": {"comments": comment}})
     return redirect(url_for("public_feed"))
 
+polls_collection = db["polls"]
+
+@app.route("/polls", methods=["GET"])
+def polls():
+    user_email = session.get("user")
+    if not user_email:
+        flash("Login required to access polls.", "warning")
+        return redirect(url_for("login"))
+
+    user = users.find_one({"email_or_phone": user_email})
+    is_verified = user.get("plan", "") in ["Verified", "Prime"]
+
+    all_polls = list(polls_collection.find())
+    for p in all_polls:
+        p["_id"] = str(p["_id"])
+        p["votes"] = p.get("votes", [0, 0])
+        p["comments"] = p.get("comments", [])
+    return render_template("polls.html", user_verified=is_verified, polls=all_polls)
+
+@app.route("/create_poll", methods=["POST"])
+def create_poll():
+    if "user" not in session:
+        return redirect(url_for("login"))
+    question = request.form.get("question")
+    options = [request.form.get("option1"), request.form.get("option2")]
+    polls_collection.insert_one({"question": question, "options": options, "votes": [0]*len(options), "comments": []})
+    return redirect("/polls")
+
+@app.route("/vote/<poll_id>", methods=["POST"])
+def vote(poll_id):
+    selected_option = request.form.get("option")
+    poll = polls_collection.find_one({"_id": ObjectId(poll_id)})
+    if poll:
+        index = poll["options"].index(selected_option)
+        poll["votes"][index] += 1
+        polls_collection.update_one({"_id": ObjectId(poll_id)}, {"$set": {"votes": poll["votes"]}})
+    return redirect("/polls")
+
+@app.route("/poll_comment/<poll_id>", methods=["POST"])
+def poll_comment(poll_id):
+    comment = request.form.get("comment")
+    polls_collection.update_one({"_id": ObjectId(poll_id)}, {"$push": {"comments": comment}})
+    return redirect("/polls")
+
+
 if __name__ == "__main__":
     app.run(debug=True)
