@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>NetaWatch – Public Feed</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;600&display=swap"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+  <style>
+    :root {
+      --primary: #e50909;
+      --bg: #f5f5f5;
+      --white: #fff;
+      --gray: #666;
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      margin: 0;
+      background: var(--bg);
+      color: #333;
+    }
+
+    .navbar {
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--primary);
+      color: white;
+      padding: 12px 24px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+
+    .navbar .logo {
+      font-size: 1.3rem;
+      font-weight: 600;
+    }
+
+    .navbar .links a {
+      color: white;
+      text-decoration: none;
+      margin-left: 20px;
+      font-weight: 500;
+    }
+
+    .navbar .links a:hover {
+      text-decoration: underline;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: 30px auto;
+      padding: 0 20px;
+    }
+
+    h2 {
+      text-align: center;
+      color: var(--primary);
+      margin-bottom: 20px;
+    }
+
+    .report-box input {
+      width: 100%;
+      padding: 12px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      cursor: pointer;
+    }
+
+    .filters {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      justify-content: center;
+      margin: 20px 0;
+    }
+
+    .filters select,
+    .filters input,
+    .filters button {
+      padding: 8px 10px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      font-size: 0.95rem;
+    }
+
+    .feed {
+      display: flex;
+      flex-direction: column;
+      gap: 25px;
+    }
+
+    .card {
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+      overflow: hidden;
+    }
+
+    .card-header {
+      padding: 15px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-weight: bold;
+    }
+
+    .card img {
+      width: 100%;
+      display: block;
+      object-fit: cover;
+      max-height: 400px;
+    }
+
+    .card-content {
+      padding: 15px;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 4px 10px;
+      font-size: 0.75rem;
+      border-radius: 12px;
+      color: white;
+      margin-top: 8px;
+    }
+
+    .resolved { background: green; }
+    .escalated { background: orange; }
+
+    .card-actions {
+      display: flex;
+      justify-content: flex-start;
+      gap: 20px;
+      padding: 0 15px 15px;
+      font-size: 1.1rem;
+      color: #444;
+    }
+
+    .card-actions span {
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .card-actions span:hover {
+      color: var(--primary);
+    }
+
+    .comment-box {
+      border-top: 1px solid #eee;
+      padding: 10px 15px;
+      background: #fafafa;
+    }
+
+    .comment-box form {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .comment-box input {
+      flex: 1;
+      padding: 6px 10px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+
+    .comment-box button {
+      background: var(--primary);
+      border: none;
+      padding: 6px 12px;
+      color: white;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .comment-box p {
+      margin: 6px 0;
+      font-size: 0.9rem;
+    }
+
+    @media (max-width: 600px) {
+      .navbar {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .navbar .links {
+        margin-top: 10px;
+      }
+
+      .filters {
+        flex-direction: column;
+      }
+
+      .card-actions {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="navbar">
+    <div class="logo">NetaWatch</div>
+    <div class="links">
+      <a href="/public_feed">Home</a>
+      <a href="/report">Report Issue</a>
+      <a href="/dashboard">Dashboard</a>
+      <a href="/logout">Logout</a>
+    </div>
+  </div>
+
+  <div class="container">
+    <h2>📢 Public Feed</h2>
+
+    <div class="report-box">
+      <form action="/report">
+        <input type="text" placeholder="Have an issue to report? Click here..." onclick="this.form.submit();" readonly />
+      </form>
+    </div>
+
+    <form method="GET" class="filters">
+      <select name="category">
+        <option value="">All Categories</option>
+        <option value="Road">Road</option>
+        <option value="Water">Water</option>
+        <option value="Garbage">Garbage</option>
+        <option value="Electricity">Electricity</option>
+      </select>
+
+      <select name="status">
+        <option value="">All Statuses</option>
+        <option value="resolved">Resolved</option>
+        <option value="escalated">Escalated</option>
+      </select>
+
+      <input type="text" name="region" placeholder="Enter City or Area" />
+
+      <button type="submit">Filter</button>
+    </form>
+
+    <div class="feed">
+      {% for issue in issues %}
+        <div class="card">
+          <div class="card-header">
+            {{ issue.category }} Issue
+            <small>{{ issue.location }} | Track ID: {{ issue.track_id }}</small>
+          </div>
+
+          {% if issue.media_file_id %}
+            <img src="/media/{{ issue.media_file_id }}" alt="Issue Image">
+          {% endif %}
+
+          <div class="card-content">
+            <p>{{ issue.description[:200] }}{% if issue.description|length > 200 %}...{% endif %}</p>
+
+            {% if issue.status == 'resolved' %}
+              <span class="badge resolved">Resolved</span>
+            {% elif issue.status == 'escalated' %}
+              <span class="badge escalated">Escalated</span>
+            {% endif %}
+          </div>
+
+          <div class="card-actions">
+            <span onclick="likeIssue('{{ issue._id }}')">
+              <i class="fa-solid fa-thumbs-up"></i>
+              <span id="like-count-{{ issue._id }}">{{ issue.likes|length }}</span> Likes
+            </span>
+            <span onclick="toggleComment('{{ issue._id }}')">
+              <i class="fa-solid fa-comment"></i>
+              <span id="comment-count-{{ issue._id }}">{{ issue.comments|length }}</span> Comments
+            </span>
+          </div>
+
+          <div class="comment-box" id="comment-box-{{ issue._id }}" style="display:none;">
+            <form action="/comment/{{ issue._id }}" method="POST">
+              <input type="text" name="text" placeholder="Write a comment..." required>
+              <button type="submit">Post</button>
+            </form>
+            {% for comment in issue.comments %}
+              <p><strong>{{ comment.user }}</strong>: {{ comment.text }}</p>
+            {% endfor %}
+          </div>
+        </div>
+      {% else %}
+        <p style="text-align:center;">No issues found.</p>
+      {% endfor %}
+    </div>
+  </div>
+
+  <script>
+    function likeIssue(issueId) {
+      fetch(`/like/${issueId}`, {
+        method: "POST"
+      })
+      .then(res => res.json())
+      .then(data => {
+        if(data.success) {
+          const count = document.getElementById(`like-count-${issueId}`);
+          count.innerText = data.like_count;
+        }
+      });
+    }
+
+    function toggleComment(issueId) {
+      const box = document.getElementById(`comment-box-${issueId}`);
+      box.style.display = box.style.display === "none" ? "block" : "none";
+    }
+  </script>
+
+</body>
+</html>

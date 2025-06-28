@@ -1,0 +1,92 @@
+<!-- polls.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Polls & Public Opinion</title>
+  <link rel="stylesheet" href="/static/css/theme.css" /> <!-- Use your old NetaWatch theme -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/chart.js/dist/Chart.min.css">
+  <style>
+    .polls-container {
+      max-width: 900px;
+      margin: auto;
+      padding: 2rem;
+    }
+    .poll-card {
+      background: #fff;
+      border-radius: 1rem;
+      padding: 1.5rem;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      margin-bottom: 2rem;
+    }
+    .chart-container {
+      margin-top: 1rem;
+    }
+    @media (max-width: 600px) {
+      .poll-card { padding: 1rem; }
+    }
+  </style>
+</head>
+<body>
+  {% include 'navbar.html' %}
+  <div class="polls-container">
+    <h2 class="text-center text-2xl font-bold mb-6">📊 Public Opinion Polls</h2>
+
+    {% if user_verified %}
+    <form method="POST" action="/create_poll" class="poll-card">
+      <h3>Create a New Poll</h3>
+      <input type="text" name="question" placeholder="Enter your poll question..." required class="input"/><br><br>
+      <input type="text" name="option1" placeholder="Option 1" required class="input"/>
+      <input type="text" name="option2" placeholder="Option 2" required class="input"/>
+      <button type="submit" class="btn btn-primary mt-2">Create Poll</button>
+    </form>
+    {% endif %}
+
+    {% for poll in polls %}
+    <div class="poll-card">
+      <h4>{{ poll.question }}</h4>
+      <form method="POST" action="/vote/{{ poll.id }}">
+        {% for option in poll.options %}
+          <label><input type="radio" name="option" value="{{ option }}" required> {{ option }}</label><br>
+        {% endfor %}
+        <button type="submit" class="btn btn-success mt-2">Vote</button>
+      </form>
+      <div class="chart-container">
+        <canvas id="chart-{{ poll.id }}"></canvas>
+      </div>
+      <script>
+        const ctx{{ poll.id }} = document.getElementById('chart-{{ poll.id }}').getContext('2d');
+        new Chart(ctx{{ poll.id }}, {
+          type: 'bar',
+          data: {
+            labels: {{ poll.options|tojson }},
+            datasets: [{
+              label: 'Votes',
+              data: {{ poll.votes|tojson }},
+              backgroundColor: '#ff4d4d'
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+          }
+        });
+      </script>
+      <div class="mt-2">
+        <strong>Discussion:</strong>
+        <form method="POST" action="/comment/{{ poll.id }}">
+          <input type="text" name="comment" placeholder="Add your thoughts..." class="input" required>
+          <button type="submit" class="btn btn-secondary">Comment</button>
+        </form>
+        <ul>
+          {% for comment in poll.comments %}
+          <li>{{ comment }}</li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</body>
+</html>

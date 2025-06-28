@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Report Civic Issue – NetaWatch</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;600&display=swap" />
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: #f4f4f4;
+      margin: 0;
+      padding: 0;
+    }
+    .navbar {
+      position: sticky;
+      top: 0;
+      background: #e50914;
+      color: white;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 24px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      z-index: 1000;
+    }
+    .navbar .logo {
+      font-weight: 600;
+      font-size: 1.3rem;
+    }
+    .navbar .links a {
+      color: white;
+      text-decoration: none;
+      margin-left: 20px;
+    }
+    .container {
+      max-width: 600px;
+      margin: 40px auto;
+      background: white;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    }
+    h2 {
+      text-align: center;
+      color: #e50914;
+      margin-bottom: 25px;
+    }
+    .form-group {
+      margin-bottom: 20px;
+    }
+    label {
+      display: block;
+      font-weight: 500;
+      margin-bottom: 6px;
+    }
+    input, select, textarea {
+      width: 100%;
+      padding: 10px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      font-size: 1rem;
+    }
+    .emoji-row {
+      display: flex;
+      align-items: center;
+    }
+    .emoji-picker-button {
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      cursor: pointer;
+      margin-left: 8px;
+    }
+    button.btn {
+      width: 100%;
+      padding: 12px;
+      background: #e50914;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+    button.btn:hover {
+      background: #000;
+    }
+  </style>
+</head>
+<body>
+  <div class="navbar">
+    <div class="logo">NetaWatch</div>
+    <div class="links">
+      <a href="/public_feed">Home</a>
+      <a href="/report">Report</a>
+      <a href="/dashboard">Dashboard</a>
+      <a href="/logout">Logout</a>
+    </div>
+  </div>
+
+  <div class="container">
+    <h2>Report a Civic Issue</h2>
+    <form action="/report" method="POST" enctype="multipart/form-data">
+      <div class="form-group">
+        <label for="media">Upload Image/Video</label>
+        <input type="file" name="media" accept="image/*,video/*" required>
+      </div>
+
+      <div class="form-group">
+        <label for="category">Category</label>
+        <select name="category" required>
+          <option value="">-- Select Category --</option>
+          <option value="Road">Road</option>
+          <option value="Water">Water</option>
+          <option value="Garbage">Garbage</option>
+          <option value="Electricity">Electricity</option>
+          <option value="Sewage">Sewage</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="description">Issue Description</label>
+        <div class="emoji-row">
+          <textarea name="description" id="description" rows="4" placeholder="Describe the issue and add emojis 😊🔥" required></textarea>
+          <button type="button" id="emoji-btn" class="emoji-picker-button">😊</button>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="location">Location</label>
+        <input type="text" name="location" id="location" required placeholder="Enter or use GPS">
+        <small><a href="#" onclick="fillCurrentLocation(event)">📍 Use My Location</a></small>
+      </div>
+
+      <div class="form-group">
+        <label>Matched Politicians</label>
+        <input type="text" name="matched" value="Ward Councillor → MLA → MP" readonly>
+      </div>
+
+      <button class="btn" type="submit">Submit Issue</button>
+    </form>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@joeattardi/emoji-button@4.6.4/dist/emoji-button.min.js"></script>
+  <script>
+    const button = document.querySelector('#emoji-btn');
+    const textarea = document.querySelector('#description');
+    const picker = new EmojiButton();
+
+    picker.on('emoji', emoji => {
+      const start = textarea.selectionStart;
+      const end = textarea.selectionEnd;
+      textarea.setRangeText(emoji, start, end, 'end');
+      textarea.focus();
+    });
+
+    button.addEventListener('click', () => {
+      picker.togglePicker(button);
+    });
+
+    function fillCurrentLocation(e) {
+      e.preventDefault();
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(pos => {
+          const { latitude, longitude } = pos.coords;
+          document.getElementById('location').value = `${latitude}, ${longitude}`;
+        }, () => alert("Location access denied."));
+      } else {
+        alert("Geolocation not supported");
+      }
+    }
+  </script>
+</body>
+</html>

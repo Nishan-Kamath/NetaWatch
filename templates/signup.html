@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Signup – NetaWatch</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;600&display=swap"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+  <style>
+    :root {
+      --primary: #e50914;
+      --dark: #0f0f0f;
+      --light: #f4f4f4;
+      --white: #fff;
+      --gray: #555;
+      --shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: var(--light);
+      color: var(--dark);
+    }
+
+    .container {
+      max-width: 420px;
+      margin: 80px auto;
+      background: #fff;
+      padding: 40px 30px;
+      border-radius: 12px;
+      box-shadow: var(--shadow);
+    }
+
+    h2 {
+      text-align: center;
+      color: var(--primary);
+      margin-bottom: 20px;
+    }
+
+    .form-group {
+      margin-bottom: 18px;
+    }
+
+    .form-group label {
+      font-weight: 500;
+      margin-bottom: 6px;
+      display: block;
+    }
+
+    .form-group input,
+    .form-group select {
+      width: 100%;
+      padding: 10px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      font-size: 1rem;
+    }
+
+    .btn {
+      width: 100%;
+      padding: 12px;
+      font-size: 1rem;
+      background: var(--primary);
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      margin-top: 10px;
+      transition: 0.3s ease;
+    }
+
+    .btn:hover {
+      background: #000;
+    }
+
+    .membership-section {
+      margin-top: 20px;
+      padding: 20px;
+      background: #f9f9f9;
+      border-radius: 10px;
+      border: 1px solid #ddd;
+    }
+
+    .membership-section h4 {
+      margin-bottom: 10px;
+      color: var(--primary);
+    }
+
+    .membership-option {
+      display: flex;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .membership-option label {
+      margin-left: 10px;
+    }
+
+    .toggle-link {
+      text-align: center;
+      display: block;
+      margin-top: 20px;
+      font-size: 0.95rem;
+    }
+
+    .toggle-link a {
+      color: var(--primary);
+      font-weight: 500;
+    }
+
+    @media (max-width: 480px) {
+      .container {
+        margin: 40px 20px;
+        padding: 30px 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h2>Create Your NetaWatch Account</h2>
+
+    <form method="POST" enctype="multipart/form-data">
+      <div class="form-group">
+        <label for="fullname">Full Name</label>
+        <input type="text" name="fullname" id="fullname" placeholder="John Doe" required>
+      </div>
+
+      <div class="form-group">
+        <label for="profile">Upload Profile Picture</label>
+        <input type="file" name="profile_pic" accept="image/*">
+      </div>
+
+      <div class="form-group">
+        <label for="address">Address</label>
+        <input type="text" name="address" id="address" placeholder="123 Main Street, City" required>
+      </div>
+
+      <div class="form-group">
+        <label for="whatsapp">WhatsApp Number</label>
+        <input type="text" name="whatsapp" id="whatsapp" placeholder="9876543210" required>
+      </div>
+
+      <div class="form-group">
+        <label for="email">Email or Phone</label>
+        <input type="text" name="email_or_phone" id="email" placeholder="you@example.com" required>
+      </div>
+
+      <div class="form-group">
+        <label for="password">Create Password</label>
+        <input type="password" name="password" id="password" placeholder="••••••••" required>
+      </div>
+
+      <div class="form-group">
+        <label for="confirm">Confirm Password</label>
+        <input type="password" name="confirm_password" id="confirm" placeholder="••••••••" required>
+      </div>
+
+      <div class="membership-section">
+        <h4>Select Membership</h4>
+        <div class="membership-option">
+          <input type="radio" name="plan" value="Free" checked>
+          <label>Free – Basic Access</label>
+        </div>
+        <div class="membership-option">
+          <input type="radio" name="plan" value="Verified">
+          <label>Verified – ₹49</label>
+        </div>
+        <div class="membership-option">
+          <input type="radio" name="plan" value="Prime">
+          <label>Prime – ₹299/year</label>
+        </div>
+        <div class="membership-option">
+          <input type="radio" name="plan" value="Pro">
+          <label>Pro – ₹999/year</label>
+        </div>
+      </div>
+
+      <button type="submit" class="btn">Sign Up</button>
+    </form>
+
+    <div class="toggle-link">
+      Already have an account? <a href="/login">Login here</a>
+    </div>
+  </div>
+
+</body>
+</html>

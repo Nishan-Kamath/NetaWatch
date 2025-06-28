@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>NetaWatch – Login</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;600&display=swap"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+  <style>
+    :root {
+      --primary: #e50914;
+      --dark: #0f0f0f;
+      --light: #f4f4f4;
+      --white: #fff;
+      --gray: #555;
+      --shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: var(--light);
+      color: var(--dark);
+    }
+
+    .container {
+      max-width: 400px;
+      margin: 80px auto;
+      background: #fff;
+      padding: 40px 30px;
+      border-radius: 12px;
+      box-shadow: var(--shadow);
+    }
+
+    h2 {
+      text-align: center;
+      color: var(--primary);
+      margin-bottom: 20px;
+    }
+
+    .form-group {
+      margin-bottom: 18px;
+    }
+
+    .form-group label {
+      font-weight: 500;
+      margin-bottom: 6px;
+      display: block;
+    }
+
+    .form-group input {
+      width: 100%;
+      padding: 10px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      font-size: 1rem;
+    }
+
+    .btn {
+      width: 100%;
+      padding: 12px;
+      font-size: 1rem;
+      background: var(--primary);
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      margin-top: 10px;
+      transition: 0.3s ease;
+    }
+
+    .btn:hover {
+      background: #000;
+    }
+
+    .form-options {
+      text-align: center;
+      margin-top: 10px;
+    }
+
+    .form-options span {
+      color: var(--primary);
+      font-size: 0.9rem;
+      cursor: pointer;
+    }
+
+    .toggle-link {
+      text-align: center;
+      font-size: 0.95rem;
+      margin-top: 20px;
+    }
+
+    .toggle-link a {
+      color: var(--primary);
+      font-weight: 500;
+    }
+
+    @media (max-width: 480px) {
+      .container {
+        margin: 40px 20px;
+        padding: 30px 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h2>Welcome to NetaWatch</h2>
+
+    <!-- Login Form -->
+    <form id="authForm" method="POST">
+      <div class="form-group">
+        <label for="email">Email or Mobile</label>
+        <input type="text" name="email" id="email" placeholder="example@email.com or +91XXXXXXXXXX" required>
+      </div>
+
+      <div class="form-group" id="passwordGroup">
+        <label for="password">Password</label>
+        <input type="password" name="password" id="password" placeholder="Enter your password">
+      </div>
+
+      <div class="form-group" id="otpGroup" style="display: none;">
+        <label for="otp">OTP</label>
+        <input type="text" name="otp" id="otp" placeholder="Enter OTP">
+      </div>
+
+      <div class="form-options">
+        <span id="toggleMode">Use OTP instead</span>
+      </div>
+
+      <button type="submit" class="btn">Login</button>
+    </form>
+
+    <div class="toggle-link">
+      Don't have an account? <a href="/signup">Sign up here</a>
+    </div>
+  </div>
+
+  <script>
+    const toggle = document.getElementById('toggleMode');
+    const passwordGroup = document.getElementById('passwordGroup');
+    const otpGroup = document.getElementById('otpGroup');
+    let usingPassword = true;
+
+    toggle.addEventListener('click', () => {
+      usingPassword = !usingPassword;
+      if (usingPassword) {
+        passwordGroup.style.display = 'block';
+        otpGroup.style.display = 'none';
+        toggle.innerText = 'Use OTP instead';
+      } else {
+        passwordGroup.style.display = 'none';
+        otpGroup.style.display = 'block';
+        toggle.innerText = 'Use Password instead';
+      }
+    });
+  </script>
+
+</body>
+</html>

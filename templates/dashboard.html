@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dashboard – NetaWatch</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;600&display=swap"/>
+  <style>
+    :root {
+      --primary: #e50914;
+      --gray: #777;
+      --bg: #fafafa;
+      --white: #fff;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Poppins', sans-serif;
+      background: var(--bg);
+    }
+
+    .navbar {
+      background: var(--primary);
+      color: white;
+      padding: 12px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+
+    .navbar .logo {
+      font-size: 1.3rem;
+      font-weight: bold;
+    }
+
+    .navbar .links a {
+      color: white;
+      text-decoration: none;
+      margin-left: 20px;
+      font-weight: 500;
+    }
+
+    .profile-section {
+      text-align: center;
+      padding: 30px 20px 10px;
+      background: var(--white);
+      border-bottom: 1px solid #ddd;
+    }
+
+    .profile-section img {
+      width: 120px;
+      height: 120px;
+      object-fit: cover;
+      border-radius: 50%;
+      border: 3px solid var(--primary);
+    }
+
+    .profile-section h2 {
+      margin: 12px 0 4px;
+      font-size: 1.4rem;
+    }
+
+    .profile-section p {
+      color: var(--gray);
+      font-size: 0.95rem;
+    }
+
+    .feed-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 20px;
+      padding: 20px;
+    }
+
+    .card {
+      background: var(--white);
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    }
+
+    .card img {
+      width: 100%;
+      height: 280px;
+      object-fit: cover;
+    }
+
+    .card .content {
+      padding: 15px;
+    }
+
+    .card h4 {
+      margin: 0;
+    }
+
+    .card p {
+      font-size: 0.9rem;
+      margin-top: 8px;
+      white-space: pre-line;
+    }
+
+    .status {
+      margin-top: 10px;
+      font-size: 0.8rem;
+      color: var(--gray);
+    }
+
+    .badge {
+      padding: 4px 10px;
+      border-radius: 12px;
+      color: white;
+      font-size: 0.75rem;
+    }
+
+    .resolved { background: green; }
+    .escalated { background: orange; }
+
+    @media (max-width: 600px) {
+      .profile-section h2 {
+        font-size: 1.2rem;
+      }
+
+      .profile-section img {
+        width: 100px;
+        height: 100px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="navbar">
+    <div class="logo">NetaWatch</div>
+    <div class="links">
+      <a href="/public_feed">Home</a>
+      <a href="/report">Report</a>
+      <a href="/logout">Logout</a>
+    </div>
+  </div>
+
+  <div class="profile-section">
+    {% if user.profile_pic_id %}
+  <img src="/profile-pic/{{ user.profile_pic_id }}" alt="Profile Picture">
+{% else %}
+  <img src="/static/default-profile.jpg" alt="Default Profile Picture">
+{% endif %}
+
+
+    <h2>{{ user.fullname }}</h2>
+    <p>{{ user.email_or_phone }}<br>{{ user.address }}<br>📱 {{ user.whatsapp }}</p>
+  </div>
+
+  <div class="feed-container">
+    {% for issue in user_issues %}
+      <div class="card">
+        <img src="/media/{{ issue.media_file_id }}" alt="Issue Image">
+        <div class="content">
+          <h4>{{ issue.category }} Issue</h4>
+          <p>{{ issue.description }}</p>
+          <div class="status">
+            Track ID: {{ issue.track_id }}<br>
+            {% if issue.status == 'resolved' %}
+              <span class="badge resolved">Resolved</span>
+            {% elif issue.status == 'escalated' %}
+              <span class="badge escalated">Escalated</span>
+            {% else %}
+              <span class="badge" style="background: gray;">Pending</span>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    {% else %}
+      <p style="text-align: center; width: 100%;">No posts found.</p>
+    {% endfor %}
+  </div>
+</body>
+</html>
