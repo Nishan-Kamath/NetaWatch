@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>NetaWatch – Admin Dashboard</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;600&display=swap"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+  <style>
+    :root {
+      --primary: #e50909;
+      --bg: #f5f5f5;
+      --white: #fff;
+      --gray: #666;
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      margin: 0;
+      background: var(--bg);
+      color: #333;
+    }
+
+    .navbar {
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--primary);
+      color: white;
+      padding: 12px 24px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+
+    .navbar .logo {
+      font-size: 1.3rem;
+      font-weight: 600;
+    }
+
+    .navbar .links a {
+      color: white;
+      text-decoration: none;
+      margin-left: 20px;
+      font-weight: 500;
+    }
+
+    .navbar .links a:hover {
+      text-decoration: underline;
+    }
+
+    .container {
+      max-width: 1000px;
+      margin: 20px auto;
+      padding: 0 20px;
+    }
+
+    h2 {
+      text-align: center;
+      color: var(--primary);
+      margin-bottom: 30px;
+    }
+
+    .admin-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 20px;
+    }
+
+    .card {
+      background: var(--white);
+      border-radius: 10px;
+      padding: 20px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    }
+
+    .card h3 {
+      margin-top: 0;
+      margin-bottom: 15px;
+      color: var(--primary);
+    }
+
+    input, textarea, select {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 10px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    input[type="file"] {
+      border: none;
+      padding-left: 0;
+    }
+
+    button {
+      padding: 8px 14px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 500;
+      margin-right: 6px;
+    }
+
+    .approve-btn { background: #28a745; color: white; }
+    .delete-btn  { background: #dc3545; color: white; }
+    .warn-btn    { background: #ffc107; color: black; }
+    .ban-btn     { background: #343a40; color: white; }
+
+    .sub-card {
+      background: #f0f0f0;
+      padding: 10px;
+      border-radius: 8px;
+      margin-bottom: 12px;
+    }
+
+    .sub-card img {
+      margin-top: 10px;
+      border-radius: 6px;
+      max-width: 100px;
+    }
+
+    .flash-container {
+      max-width: 1000px;
+      margin: 20px auto;
+      padding: 0 20px;
+    }
+
+    .flash {
+      padding: 12px 16px;
+      border-radius: 6px;
+      margin-bottom: 15px;
+      font-weight: 500;
+      font-size: 0.95rem;
+    }
+
+    .flash-success {
+      background-color: #d4edda;
+      color: #155724;
+      border-left: 4px solid #28a745;
+    }
+
+    .flash-error, .flash-danger {
+      background-color: #f8d7da;
+      color: #721c24;
+      border-left: 4px solid #dc3545;
+    }
+
+    .flash-warning {
+      background-color: #fff3cd;
+      color: #856404;
+      border-left: 4px solid #ffc107;
+    }
+
+    .flash-info {
+      background-color: #d1ecf1;
+      color: #0c5460;
+      border-left: 4px solid #17a2b8;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 20px;
+      font-size: 15px;
+    }
+
+    th, td {
+      padding: 10px;
+      border-bottom: 1px solid #ccc;
+      text-align: left;
+    }
+
+    th {
+      background-color: #eee;
+    }
+
+    .edit-btn {
+      background-color: #007bff;
+      color: white;
+      padding: 6px 10px;
+      border-radius: 5px;
+      text-decoration: none;
+      margin-right: 5px;
+    }
+
+    .edit-btn:hover {
+      background-color: #0056b3;
+    }
+
+    @media (max-width: 600px) {
+      .admin-grid {
+        grid-template-columns: 1fr;
+      }
+      table {
+        font-size: 13px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="navbar">
+    <div class="logo">NetaWatch Admin</div>
+    <div class="links">
+      <a href="/">Home</a>
+      <a href="/logout">Logout</a>
+    </div>
+  </div>
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      <div class="flash-container">
+        {% for category, message in messages %}
+          <div class="flash flash-{{ category }}">{{ message }}</div>
+        {% endfor %}
+      </div>
+    {% endif %}
+  {% endwith %}
+
+  <div class="container">
+    <h2>🛠️ Admin Dashboard</h2>
+
+    <div class="admin-grid">
+
+      <section class="card">
+        <h3>Pending Issues</h3>
+        {% for issue in issues %}
+          <div class="sub-card">
+            <p><strong>{{ issue.track_id }}</strong> — {{ issue.description[:100] }}...</p>
+            <form method="POST" action="/admin/issue/{{ issue._id }}">
+              <button name="action" value="approve" class="approve-btn">✅ Approve</button>
+              <button name="action" value="delete" class="delete-btn">🗑️ Delete</button>
+            </form>
+          </div>
+        {% else %}
+          <p>No pending issues.</p>
+        {% endfor %}
+      </section>
+
+      <section class="card">
+        <h3>Politician Profiles</h3>
+        <form method="POST" action="/admin/add_politician" enctype="multipart/form-data">
+          <input name="name" placeholder="Full Name" required>
+          <input name="region" placeholder="Region" required>
+          <select name="type" required>
+            <option value="">Select Type</option>
+            <option value="Ward">Ward</option>
+            <option value="MLA">MLA</option>
+            <option value="MP">MP</option>
+          </select>
+          <input type="file" name="profile_pic" accept="image/*">
+          <button type="submit">➕ Add / Update</button>
+        </form>
+      </section>
+
+      <section class="card">
+        <h3>Escalation Logic</h3>
+        <form method="POST" action="/admin/update_escalation">
+          <textarea name="logic" rows="4" placeholder="Enter logic here...">{{ escalation_logic }}</textarea>
+          <button type="submit">💾 Save</button>
+        </form>
+      </section>
+
+      <section class="card">
+        <h3>RTI Responses</h3>
+        {% for rti in rti_responses %}
+          <div class="sub-card">
+            <p><strong>{{ rti.source }}</strong> — {{ rti.response }}</p>
+          </div>
+        {% else %}
+          <p>No RTI responses available.</p>
+        {% endfor %}
+      </section>
+
+      <section class="card">
+        <h3>User Reports</h3>
+        {% for report in reports %}
+          <div class="sub-card">
+            <p><strong>{{ report.user }}</strong> — {{ report.reason }}</p>
+            <form method="POST" action="/admin/report/{{ report._id }}">
+              <button name="action" value="warn" class="warn-btn">⚠️ Warn</button>
+              <button name="action" value="ban" class="ban-btn">🚫 Ban</button>
+            </form>
+          </div>
+        {% else %}
+          <p>No user reports found.</p>
+        {% endfor %}
+      </section>
+
+    </div> <!-- END of .admin-grid -->
+  </div> <!-- END of .container -->
+
+  <!-- OUTSIDE GRID – Politician Directory -->
+  <section class="card" style="max-width: 1000px; margin: 40px auto;">
+    <h2 style="text-align:center; color: var(--primary); margin-top: 30px;">🧾 Politicians – Directory</h2>
+    {% for category in ['MLA', 'MP', 'Ward'] %}
+      <h4>{{ category }}s</h4>
+      <table>
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Region</th>
+            <th>Type</th>
+            <th>Photo</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% set found = false %}
+          {% for p in politicians if p.type == category %}
+            {% set found = true %}
+            <tr>
+              <td>{{ p.name }}</td>
+              <td>{{ p.region }}</td>
+              <td>{{ p.type }}</td>
+              <td>
+                {% if p.profile_pic_id %}
+                  <img src="{{ url_for('serve_profile_pic', file_id=p.profile_pic_id) }}" style="width: 60px; border-radius: 6px;">
+                {% else %} — {% endif %}
+              </td>
+              <td>
+                <a href="/admin/edit_politician/{{ p._id }}" class="edit-btn">✏️ Edit</a>
+                <form method="POST" action="/admin/delete_politician/{{ p._id }}" style="display:inline;">
+                  <button type="submit" class="delete-btn">🗑️ Delete</button>
+                </form>
+              </td>
+            </tr>
+          {% endfor %}
+          {% if not found %}
+            <tr><td colspan="5">No {{ category }}s found.</td></tr>
+          {% endif %}
+        </tbody>
+      </table>
+    {% endfor %}
+  </section>
+
+</body>
+</html>

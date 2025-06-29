@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Edit Politician – NetaWatch</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;600&display=swap"/>
+  <style>
+    :root {
+      --primary: #e50909;
+      --bg: #f5f5f5;
+      --white: #fff;
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      margin: 0;
+      background: var(--bg);
+      color: #333;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: 40px auto;
+      padding: 20px;
+      background: var(--white);
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    h2 {
+      text-align: center;
+      color: var(--primary);
+      margin-bottom: 20px;
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+    }
+
+    input, select {
+      padding: 10px;
+      margin-bottom: 15px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    input[type="file"] {
+      border: none;
+    }
+
+    button {
+      background: var(--primary);
+      color: white;
+      padding: 10px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: 0.3s ease;
+    }
+
+    button:hover {
+      background: #b10707;
+    }
+
+    .back-link {
+      display: inline-block;
+      margin-top: 10px;
+      color: var(--primary);
+      text-decoration: none;
+    }
+
+    .profile-img-preview {
+      margin: 10px 0;
+    }
+
+    .profile-img-preview img {
+      width: 100px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+
+    @media (max-width: 500px) {
+      .container {
+        margin: 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h2>✏️ Edit Politician</h2>
+
+    <form method="POST" enctype="multipart/form-data">
+      <input type="text" name="name" value="{{ p.name }}" placeholder="Full Name" required>
+      <input type="text" name="region" value="{{ p.region }}" placeholder="Region" required>
+
+      <select name="type" required>
+        <option value="">Select Type</option>
+        <option value="Ward" {% if p.type == 'Ward' %}selected{% endif %}>Ward</option>
+        <option value="MLA" {% if p.type == 'MLA' %}selected{% endif %}>MLA</option>
+        <option value="MP" {% if p.type == 'MP' %}selected{% endif %}>MP</option>
+      </select>
+
+      {% if p.profile_pic_id %}
+      <div class="profile-img-preview">
+        <p>Current Profile Picture:</p>
+        <img src="{{ url_for('serve_profile_pic', file_id=p.profile_pic_id) }}" alt="Current Picture">
+      </div>
+      {% endif %}
+
+      <input type="file" name="profile_pic" accept="image/*">
+      <button type="submit">💾 Update</button>
+    </form>
+
+    <a href="/admin/dashboard" class="back-link">← Back to Dashboard</a>
+  </div>
+
+</body>
+</html>

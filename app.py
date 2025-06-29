@@ -15,6 +15,10 @@ client = MongoClient(uri)
 db = client["neta_watch"]
 users = db["users"]
 issues = db["issues"]
+politicians = db["politicians"]
+rti = db["rti"]
+reports = db["reports"]
+config = db["config"]
 fs = gridfs.GridFS(db)
 
 @app.route("/")
@@ -29,7 +33,9 @@ def login():
         otp = request.form.get("otp")
         plan = request.form.get("plan")
         user = users.find_one({"email_or_phone": email_or_phone})
-
+        if email_or_phone == 'admin' and password=='admin':
+            session['user'] = 'admin'
+            return redirect(url_for('admin_dashboard'))
         if password:
             if user and user.get("password") == password:
                 flash("Login successful with password!", "success")
@@ -96,6 +102,140 @@ def signup():
         return redirect(url_for('login'))
 
     return render_template("signup.html")
+
+@app.route("/admin/dashboard")
+def admin_dashboard():
+    if session.get("user") != "admin":
+        flash("Access denied. Admin only.", "danger")
+        return redirect(url_for("login"))
+
+    pending_issues = list(issues.find({"status": "pending"}))
+    rti_responses = list(rti.find())
+    abuse_reports = list(reports.find())
+    escalation = config.find_one({"type": "escalation"}) or {"logic": ""}
+
+    all_politicians = list(politicians.find())
+
+    return render_template(
+        "admin_dashboard.html",
+        issues=pending_issues,
+        rti_responses=rti_responses,
+        reports=abuse_reports,
+        escalation_logic=escalation["logic"],
+        politicians=all_politicians  # ✅ Add this
+    )
+
+
+@app.route("/admin/issue/<issue_id>", methods=["POST"])
+def admin_approve_issue(issue_id):
+    if session.get("user") != "admin":
+        return redirect(url_for("login"))
+
+    action = request.form.get("action")
+    if action == "approve":
+        issues.update_one({"_id": ObjectId(issue_id)}, {"$set": {"status": "approved"}})
+        flash("Issue approved!", "success")
+    elif action == "delete":
+        issues.delete_one({"_id": ObjectId(issue_id)})
+        flash("Issue deleted.", "info")
+    return redirect(url_for("admin_dashboard"))
+
+@app.route("/admin/add_politician", methods=["POST"])
+def admin_add_politician():
+    if session.get("user") != "admin":
+        return redirect(url_for("login"))
+
+    name = request.form.get("name")
+    region = request.form.get("region")
+    role_type = request.form.get("type")
+    profile_pic = request.files.get("profile_pic")
+
+    pic_id = None
+    if profile_pic and profile_pic.filename:
+        filename = secure_filename(profile_pic.filename)
+        pic_id = fs.put(profile_pic, filename=filename, content_type=profile_pic.content_type)
+
+    politicians.update_one(
+        {"name": name},
+        {
+            "$set": {
+                "region": region,
+                "type": role_type,
+                "profile_pic_id": pic_id
+            }
+        },
+        upsert=True
+    )
+
+    flash("Politician added/updated with details.", "success")
+    return redirect(url_for("admin_dashboard"))
+
+@app.route("/admin/delete_politician/<id>", methods=["POST"])
+def delete_politician(id):
+    if session.get("user") != "admin":
+        return redirect(url_for("login"))
+    politicians.delete_one({"_id": ObjectId(id)})
+    flash("Politician deleted.", "info")
+    return redirect(url_for("admin_dashboard"))
+
+@app.route("/admin/edit_politician/<id>", methods=["GET", "POST"])
+def edit_politician(id):
+    if session.get("user") != "admin":
+        return redirect(url_for("login"))
+    politician = politicians.find_one({"_id": ObjectId(id)})
+
+    if request.method == "POST":
+        updated_data = {
+            "name": request.form.get("name"),
+            "region": request.form.get("region"),
+            "type": request.form.get("type")
+        }
+        pic = request.files.get("profile_pic")
+        if pic and pic.filename:
+            filename = secure_filename(pic.filename)
+            pic_id = fs.put(pic, filename=filename, content_type=pic.content_type)
+            updated_data["profile_pic_id"] = pic_id
+
+        politicians.update_one({"_id": ObjectId(id)}, {"$set": updated_data})
+        flash("Politician updated successfully.", "success")
+        return redirect(url_for("admin_dashboard"))
+
+    return render_template("edit_politician.html", p=politician)
+
+
+@app.route("/admin/update_escalation", methods=["POST"])
+def admin_update_escalation():
+    if session.get("user") != "admin":
+        return redirect(url_for("login"))
+
+    logic = request.form.get("logic")
+    config.update_one(
+        {"type": "escalation"},
+        {"$set": {"logic": logic}},
+        upsert=True
+    )
+    flash("Escalation logic updated.", "success")
+    return redirect(url_for("admin_dashboard"))
+
+@app.route("/admin/report/<report_id>", methods=["POST"])
+def admin_handle_report(report_id):
+    if session.get("user") != "admin":
+        return redirect(url_for("login"))
+
+    action = request.form.get("action")
+    report = reports.find_one({"_id": ObjectId(report_id)})
+    if not report:
+        flash("Report not found.", "danger")
+        return redirect(url_for("admin_dashboard"))
+
+    if action == "warn":
+        reports.update_one({"_id": ObjectId(report_id)}, {"$set": {"status": "warned"}})
+        flash("User warned.", "warning")
+    elif action == "ban":
+        users.update_one({"email_or_phone": report["user"]}, {"$set": {"banned": True}})
+        flash("User banned.", "danger")
+
+    return redirect(url_for("admin_dashboard"))
 
 
 @app.route('/dashboard')
