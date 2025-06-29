@@ -12,6 +12,7 @@
       margin: 0;
       padding: 0;
     }
+
     .navbar {
       position: sticky;
       top: 0;
@@ -24,15 +25,58 @@
       box-shadow: 0 2px 5px rgba(0,0,0,0.1);
       z-index: 1000;
     }
+
     .navbar .logo {
       font-weight: 600;
       font-size: 1.3rem;
     }
+
+    .menu-toggle {
+      font-size: 1.5rem;
+      color: white;
+      cursor: pointer;
+      display: none;
+    }
+
+    .navbar .links {
+      display: flex;
+      gap: 20px;
+    }
+
     .navbar .links a {
       color: white;
       text-decoration: none;
-      margin-left: 20px;
+      font-weight: 500;
     }
+
+    @media (max-width: 768px) {
+      .menu-toggle {
+        display: block;
+      }
+
+      .navbar {
+        flex-wrap: wrap;
+        position: relative;
+      }
+
+      .navbar .links {
+        display: none;
+        flex-direction: column;
+        width: 100%;
+        background: #e50914;
+        margin-top: 10px;
+        padding: 10px 0;
+      }
+
+      .navbar .links a {
+        padding: 10px 24px;
+      }
+
+      .navbar .links.active {
+        display: flex;
+      }
+    }
+
     .container {
       max-width: 600px;
       margin: 40px auto;
@@ -41,19 +85,23 @@
       border-radius: 10px;
       box-shadow: 0 4px 12px rgba(0,0,0,0.05);
     }
+
     h2 {
       text-align: center;
       color: #e50914;
       margin-bottom: 25px;
     }
+
     .form-group {
       margin-bottom: 20px;
     }
+
     label {
       display: block;
       font-weight: 500;
       margin-bottom: 6px;
     }
+
     input, select, textarea {
       width: 100%;
       padding: 10px;
@@ -61,10 +109,12 @@
       border: 1px solid #ccc;
       font-size: 1rem;
     }
+
     .emoji-row {
       display: flex;
       align-items: center;
     }
+
     .emoji-picker-button {
       background: none;
       border: none;
@@ -72,6 +122,7 @@
       cursor: pointer;
       margin-left: 8px;
     }
+
     button.btn {
       width: 100%;
       padding: 12px;
@@ -82,22 +133,27 @@
       font-size: 1rem;
       cursor: pointer;
     }
+
     button.btn:hover {
       background: #000;
     }
   </style>
 </head>
 <body>
+
+  <!-- Navbar -->
   <div class="navbar">
     <div class="logo">NetaWatch</div>
-    <div class="links">
-      <a href="/public_feed">Home</a>
-      <a href="/report">Report</a>
+    <div class="menu-toggle" onclick="toggleMenu()">☰</div>
+    <div class="links" id="navLinks">
+      <a href="/feed">Home</a>
+      <a href="/polls">Polls</a>
       <a href="/dashboard">Dashboard</a>
       <a href="/logout">Logout</a>
     </div>
   </div>
 
+  <!-- Form Container -->
   <div class="container">
     <h2>Report a Civic Issue</h2>
     <form action="/report" method="POST" enctype="multipart/form-data">
@@ -141,6 +197,7 @@
     </form>
   </div>
 
+  <!-- Scripts -->
   <script src="https://cdn.jsdelivr.net/npm/@joeattardi/emoji-button@4.6.4/dist/emoji-button.min.js"></script>
   <script>
     const button = document.querySelector('#emoji-btn');
@@ -168,6 +225,10 @@
       } else {
         alert("Geolocation not supported");
       }
+    }
+
+    function toggleMenu() {
+      document.getElementById("navLinks").classList.toggle("active");
     }
   </script>
 </body>
